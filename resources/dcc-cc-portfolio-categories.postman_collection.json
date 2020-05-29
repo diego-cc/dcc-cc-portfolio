@@ -1,0 +1,737 @@
+{
+	"info": {
+		"_postman_id": "a282abc6-2d79-4b3f-8c53-90f0adfb5561",
+		"name": "dcc-cc-portfolio",
+		"description": "API requests for the Cloud Computing assesment project",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "GET api/version.php",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://dcc-cc-portfolio.test/api/version.php",
+					"protocol": "http",
+					"host": [
+						"dcc-cc-portfolio",
+						"test"
+					],
+					"path": [
+						"api",
+						"version.php"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET api/categories/read.php",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://dcc-cc-portfolio.test/api/categories/read.php",
+					"protocol": "http",
+					"host": [
+						"dcc-cc-portfolio",
+						"test"
+					],
+					"path": [
+						"api",
+						"categories",
+						"read.php"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET api/categories/readOne.php with id = 3",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"id\": 3\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://dcc-cc-portfolio.test/api/categories/readOne.php",
+					"protocol": "http",
+					"host": [
+						"dcc-cc-portfolio",
+						"test"
+					],
+					"path": [
+						"api",
+						"categories",
+						"readOne.php"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET api/categories/readOne.php with id = 999",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"id\": 999\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://dcc-cc-portfolio.test/api/categories/readOne.php",
+					"protocol": "http",
+					"host": [
+						"dcc-cc-portfolio",
+						"test"
+					],
+					"path": [
+						"api",
+						"categories",
+						"readOne.php"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET api/categories/readOne.php with no id",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://dcc-cc-portfolio.test/api/categories/readOne.php",
+					"protocol": "http",
+					"host": [
+						"dcc-cc-portfolio",
+						"test"
+					],
+					"path": [
+						"api",
+						"categories",
+						"readOne.php"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /api/categories/search.php?search=query with query = MOT",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://dcc-cc-portfolio.test/api/categories/search.php?search=MOT",
+					"protocol": "http",
+					"host": [
+						"dcc-cc-portfolio",
+						"test"
+					],
+					"path": [
+						"api",
+						"categories",
+						"search.php"
+					],
+					"query": [
+						{
+							"key": "search",
+							"value": "MOT"
+						}
+					]
+				},
+				"description": "Search for a category by its code or description"
+			},
+			"response": []
+		},
+		{
+			"name": "GET /api/categories/search.php?search=query with query =",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://dcc-cc-portfolio.test/api/categories/search.php?search=",
+					"protocol": "http",
+					"host": [
+						"dcc-cc-portfolio",
+						"test"
+					],
+					"path": [
+						"api",
+						"categories",
+						"search.php"
+					],
+					"query": [
+						{
+							"key": "search",
+							"value": ""
+						}
+					]
+				},
+				"description": "Search for a category by its code or description"
+			},
+			"response": []
+		},
+		{
+			"name": "GET /api/categories/search.php?search=query with query = nothing",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://dcc-cc-portfolio.test/api/categories/search.php?search=nothing",
+					"protocol": "http",
+					"host": [
+						"dcc-cc-portfolio",
+						"test"
+					],
+					"path": [
+						"api",
+						"categories",
+						"search.php"
+					],
+					"query": [
+						{
+							"key": "search",
+							"value": "nothing"
+						}
+					]
+				},
+				"description": "Search for a category by its code or description"
+			},
+			"response": []
+		},
+		{
+			"name": "POST api/categories/create.php with code = SMPH, name = iPhoneX.png and description = iPhone X",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"code\": \"SMPH\",\n\t\"name\": \"iPhoneX.png\",\n\t\"description\": \"iPhone X\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://dcc-cc-portfolio.test/api/categories/create.php",
+					"protocol": "http",
+					"host": [
+						"dcc-cc-portfolio",
+						"test"
+					],
+					"path": [
+						"api",
+						"categories",
+						"create.php"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST api/categories/create.php with code = SMPH, name = AnotherPhone.png and description = Galaxy S999",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"code\": \"SMPH\",\n\t\"name\": \"AnotherPhone.png\",\n\t\"description\": \"Galaxy S999\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://dcc-cc-portfolio.test/api/categories/create.php",
+					"protocol": "http",
+					"host": [
+						"dcc-cc-portfolio",
+						"test"
+					],
+					"path": [
+						"api",
+						"categories",
+						"create.php"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST api/categories/create.php with code = SMTH, name = something.png and no description",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"code\": \"SMTH\",\n\t\"name\": \"something.png\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://dcc-cc-portfolio.test/api/categories/create.php",
+					"protocol": "http",
+					"host": [
+						"dcc-cc-portfolio",
+						"test"
+					],
+					"path": [
+						"api",
+						"categories",
+						"create.php"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST api/categories/create.php with code = SMTH, description = something and no name",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"code\": \"SMTH\",\n\t\"description\": \"something\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://dcc-cc-portfolio.test/api/categories/create.php",
+					"protocol": "http",
+					"host": [
+						"dcc-cc-portfolio",
+						"test"
+					],
+					"path": [
+						"api",
+						"categories",
+						"create.php"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST api/categories/create.php with description = something, name = something.png and no code",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"something.png\",\n\t\"description\": \"something\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://dcc-cc-portfolio.test/api/categories/create.php",
+					"protocol": "http",
+					"host": [
+						"dcc-cc-portfolio",
+						"test"
+					],
+					"path": [
+						"api",
+						"categories",
+						"create.php"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PUT api/categories/update.php  with id = 30, code = SMPH, name = galaxyS999.png and description = Galaxy S999",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Access-Control-Request-Headers",
+						"type": "text",
+						"value": "PUT",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"id\": 30,\n\t\"code\": \"SMPH\",\n\t\"description\": \"Galaxy S999\",\n\t\"name\": \"galaxyS999.png\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://dcc-cc-portfolio.test/api/categories/update.php",
+					"protocol": "http",
+					"host": [
+						"dcc-cc-portfolio",
+						"test"
+					],
+					"path": [
+						"api",
+						"categories",
+						"update.php"
+					]
+				},
+				"description": "Update a category with a given id"
+			},
+			"response": []
+		},
+		{
+			"name": "PUT api/categories/update.php with id = 999, code = SMPH, name = galaxyS999.png and description = Galaxy S999",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Access-Control-Request-Headers",
+						"type": "text",
+						"value": "PUT",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"id\": 999,\n\t\"code\": \"SMPH\",\n\t\"description\": \"Galaxy S999\",\n\t\"name\": \"galaxyS999.png\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://dcc-cc-portfolio.test/api/categories/update.php",
+					"protocol": "http",
+					"host": [
+						"dcc-cc-portfolio",
+						"test"
+					],
+					"path": [
+						"api",
+						"categories",
+						"update.php"
+					]
+				},
+				"description": "Update a category with a given id"
+			},
+			"response": []
+		},
+		{
+			"name": "PUT api/categories/update.php with code = SMPH, name = galaxyS999.png, description = Galaxy S999 and no id",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Access-Control-Request-Headers",
+						"type": "text",
+						"value": "PUT",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"code\": \"SMPH\",\n\t\"description\": \"Galaxy S999\",\n\t\"name\": \"galaxyS999.png\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://dcc-cc-portfolio.test/api/categories/update.php",
+					"protocol": "http",
+					"host": [
+						"dcc-cc-portfolio",
+						"test"
+					],
+					"path": [
+						"api",
+						"categories",
+						"update.php"
+					]
+				},
+				"description": "Update a category with a given id"
+			},
+			"response": []
+		},
+		{
+			"name": "PUT api/categories/update.php with id = 30, code = SMPH, name = galaxyS999.png and no description",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Access-Control-Request-Headers",
+						"type": "text",
+						"value": "PUT",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"id\": 30,\n\t\"code\": \"SMPH\",\n\t\"name\": \"galaxyS999.png\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://dcc-cc-portfolio.test/api/categories/update.php",
+					"protocol": "http",
+					"host": [
+						"dcc-cc-portfolio",
+						"test"
+					],
+					"path": [
+						"api",
+						"categories",
+						"update.php"
+					]
+				},
+				"description": "Update a category with a given id"
+			},
+			"response": []
+		},
+		{
+			"name": "PUT api/categories/update.php with id = 30, code = SMPH, description = Galaxy S999 and no name",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Access-Control-Request-Headers",
+						"type": "text",
+						"value": "PUT",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"id\": 30,\n\t\"code\": \"SMPH\",\n\t\"description\": \"Galaxy S999\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://dcc-cc-portfolio.test/api/categories/update.php",
+					"protocol": "http",
+					"host": [
+						"dcc-cc-portfolio",
+						"test"
+					],
+					"path": [
+						"api",
+						"categories",
+						"update.php"
+					]
+				},
+				"description": "Update a category with a given id"
+			},
+			"response": []
+		},
+		{
+			"name": "PUT api/categories/update.php with id = 30, name = galaxyS999.png, description = Galaxy S999 and no code",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Access-Control-Request-Headers",
+						"type": "text",
+						"value": "PUT",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"id\": 30,\n\t\"name\": \"galaxyS999.png\",\n\t\"description\": \"Galaxy S999\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://dcc-cc-portfolio.test/api/categories/update.php",
+					"protocol": "http",
+					"host": [
+						"dcc-cc-portfolio",
+						"test"
+					],
+					"path": [
+						"api",
+						"categories",
+						"update.php"
+					]
+				},
+				"description": "Update a category with a given id"
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE api/categories/delete.php with id = 22",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\t\n\t\"id\": 22\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://dcc-cc-portfolio.test/api/categories/delete.php",
+					"protocol": "http",
+					"host": [
+						"dcc-cc-portfolio",
+						"test"
+					],
+					"path": [
+						"api",
+						"categories",
+						"delete.php"
+					]
+				},
+				"description": "Delete a category with a given id"
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE api/categories/delete.php with id = 999",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\t\n\t\"id\": 999\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://dcc-cc-portfolio.test/api/categories/delete.php",
+					"protocol": "http",
+					"host": [
+						"dcc-cc-portfolio",
+						"test"
+					],
+					"path": [
+						"api",
+						"categories",
+						"delete.php"
+					]
+				},
+				"description": "Delete a category with a given id"
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE api/categories/delete.php with no id",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\t\n\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://dcc-cc-portfolio.test/api/categories/delete.php",
+					"protocol": "http",
+					"host": [
+						"dcc-cc-portfolio",
+						"test"
+					],
+					"path": [
+						"api",
+						"categories",
+						"delete.php"
+					]
+				},
+				"description": "Delete a category with a given id"
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE api/categories/delete.php with a non-numeric id",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\t\n\t\"id\": \"asd\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://dcc-cc-portfolio.test/api/categories/delete.php",
+					"protocol": "http",
+					"host": [
+						"dcc-cc-portfolio",
+						"test"
+					],
+					"path": [
+						"api",
+						"categories",
+						"delete.php"
+					]
+				},
+				"description": "Delete a category with a given id"
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
