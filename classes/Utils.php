@@ -63,7 +63,12 @@ class Utils
     {
         foreach ($messageList as $message) {
             foreach ($message as $type => $text) {
-                echo "<p class='alert alert-". strtolower($type) . "'>{$type}: {$text}</p>";
+                echo '<div class="alert alert-' . strtolower($type) . ' alert-dismissible fade show" role="alert">';
+                echo '<p class="text-center">'. $text . '</p>';
+                echo '<button type="button" class="close" data-dismiss="alert" aria-label="Close">';
+                echo  '<span aria-hidden="true">&times;</span>';
+                echo '</button>';
+                echo '</div>';
             }
         }
     }

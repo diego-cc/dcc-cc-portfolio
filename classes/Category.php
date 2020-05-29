@@ -58,7 +58,7 @@ class Category
      * File name with extension
      * @var string
      */
-    public $icon;
+    public $image;
 
     /**
      * @var \DateTime | string
