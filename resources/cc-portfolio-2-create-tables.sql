@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS `categories`
     `code`        char(4)      NOT NULL DEFAULT 'UNKN' UNIQUE,
     `name`        varchar(32)  NOT NULL DEFAULT 'ERROR: Unknown',
     `description` varchar(255) NOT NULL DEFAULT 'ERROR: Unknown',
-    `image`       varchar(255) DEFAULT 'Unavailable',
+    `icon`        varchar(255) DEFAULT 'Unavailable',
     `created_at`  datetime     NOT NULL DEFAULT NOW(),
     `updated_at`  datetime     NULL ON UPDATE NOW(),
     PRIMARY KEY (`id`)
