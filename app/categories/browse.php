@@ -14,7 +14,8 @@ namespace DccCcPortfolio;
 $title = 'Browse categories'
 ?>
 
-<?php include('../templates/nav.php'); ?>
+<?php
+include('../templates/nav.php'); ?>
 
 <!-- container -->
 <main role="main" class="container">
@@ -27,9 +28,9 @@ $title = 'Browse categories'
 
     <div class="row mb-5">
         <div class="col-sm text-center">
-            <button class="btn btn-primary btn-lg">
+            <a class="btn btn-primary btn-lg" href="create.php">
                 Add a new category
-            </button>
+            </a>
         </div>
     </div>
 
@@ -69,10 +70,10 @@ $title = 'Browse categories'
         $activePage = (int)$_GET["page"] > $numOfPages ? $numOfPages : (int)$_GET["page"];
     }
 
-    // select only the data needed per page
-    $query = "SELECT id, code, name, description
+    // select only the data needed per page, sorted by latest updated
+    $query = "SELECT id, code, icon, name, description, created_at, updated_at
                           FROM categories
-                          ORDER BY id
+                          ORDER BY created_at DESC, updated_at ASC
                           LIMIT :rowsToSkip, :recordsPerPage";
 
     $rowsToSkip = ($activePage - 1) * $recordsPerPage;
@@ -89,7 +90,7 @@ $title = 'Browse categories'
         <div class="col-sm">
             <nav aria-label="Page navigation example">
                 <ul class="pagination">
-                    <li class="page-item <?=$activePage <= 1 ? 'disabled' : ''?>">
+                    <li class="page-item <?= $activePage <= 1 ? 'disabled' : '' ?>">
                         <a
                                 class="page-link"
                                 href="
@@ -100,7 +101,7 @@ $title = 'Browse categories'
                             <span class="sr-only">First page</span>
                         </a>
                     </li>
-                    <li class="page-item <?=$activePage <= 1 ? 'disabled' : ''?>">
+                    <li class="page-item <?= $activePage <= 1 ? 'disabled' : '' ?>">
                         <a
                                 class="page-link"
                                 href="
@@ -119,7 +120,7 @@ $title = 'Browse categories'
                         <?php
                     }
                     ?>
-                    <li class="page-item <?=$activePage >= $numOfPages ? 'disabled' : ''?>">
+                    <li class="page-item <?= $activePage >= $numOfPages ? 'disabled' : '' ?>">
                         <a class="page-link"
                            href="<?= "browse.php?page=".($activePage + 1 > $numOfPages ? $activePage : $activePage + 1) ?>"
                            aria-label="Next">
@@ -127,7 +128,7 @@ $title = 'Browse categories'
                             <span class="sr-only">Next</span>
                         </a>
                     </li>
-                    <li class="page-item <?=$activePage >= $numOfPages ? 'disabled' : ''?>">
+                    <li class="page-item <?= $activePage >= $numOfPages ? 'disabled' : '' ?>">
                         <a class="page-link"
                            href="<?= "browse.php?page=".($numOfPages) ?>"
                            aria-label="Next">
@@ -147,24 +148,55 @@ $title = 'Browse categories'
                 ?>
                 <table class="table">
                     <thead>
-                    <tr>
+                    <tr class="text-center">
                         <th>ID</th>
+                        <th>Icon</th>
+                        <th>Code</th>
                         <th>Name</th>
                         <th>Description</th>
-                        <th>Price</th>
                         <th>Action</th>
                     </tr>
                     </thead>
                     <tbody>
                     <?php
-                    while ($row = $stmt->fetch(PDO::FETCH_OBJ)) {
-                        // creating new table row per record
-                        ?>
-                        <tr>
+                    while ($row = $stmt->fetch(PDO::FETCH_OBJ)) { ?>
+
+                        <tr class="text-center">
                             <td><?= $row->id ?></td>
-                            <td><?= $row->code ?></td>
-                            <td><?= $row->name ?></td>
-                            <td><?= $row->description ?></td>
+                            <td>
+                                <?php
+                                // Get icon extension
+                                $ext = pathinfo($row->icon, PATHINFO_EXTENSION);
+
+                                if ($ext === 'png') {
+                                    // icon extension is valid, check if it was uploaded
+                                    try {
+                                        date_default_timezone_set('Australia/Perth');
+                                        $filePath = 'uploads/'.date_format(
+                                                new \DateTime($row->created_at),
+                                                'd-m-Y'
+                                            ).'/'.sha1($row->icon.'_'.$row->code).'.png';
+
+                                        if (file_exists($filePath)) {
+                                            // display icon
+                                            echo '<img src="'.$filePath.'" alt="'.$row->icon.'" width="48" height="48" />';
+                                        } else {
+                                            // icon was not found, show its name anyway
+                                            // a placeholder icon could be displayed here as well
+                                            echo $row->icon;
+                                        }
+                                    } catch (\Exception $e) {
+                                        echo 'Could not load icon';
+                                    }
+                                } else {
+                                    // "Unavailable"
+                                    echo $row->icon;
+                                }
+                                ?>
+                            </td>
+                            <td><?= htmlspecialchars_decode($row->code, ENT_QUOTES) ?></td>
+                            <td><?= htmlspecialchars_decode($row->name, ENT_QUOTES) ?></td>
+                            <td><?= htmlspecialchars_decode($row->description, ENT_QUOTES) ?></td>
                             <td>
                                 <a href="read.php?id=<?= $row->id ?>"
                                    class="btn btn-info mr-1">
@@ -176,7 +208,8 @@ $title = 'Browse categories'
                                 </a>
                             </td>
                         </tr>
-                        <?php
+
+                    <?php
                     } ?>
                     </tbody>
                 </table>
@@ -192,5 +225,6 @@ $title = 'Browse categories'
     </div>
 </main> <!-- end .container -->
 
-<?php include('../templates/scripts.php'); ?>
+<?php
+include('../templates/scripts.php'); ?>
 

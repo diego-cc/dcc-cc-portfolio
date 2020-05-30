@@ -58,7 +58,7 @@ class Category
      * File name with extension
      * @var string
      */
-    public $image;
+    public $icon;
 
     /**
      * @var \DateTime | string
@@ -115,29 +115,48 @@ class Category
      * Create a new category
      * Use: `$category->create()`
      *
-     * @return bool Whether the operation was successful
+     * @return array
+     * A result that indicates whether an error has occurred and its message.
+     * Examples:
+     *
+     * ["error" => false]
+     *
+     * ["error" => true, "message" => "Could not connect to database"]
+     *
      */
     public function create()
     {
-        /**
-         * INSERT a new category
-         */
-        $query = "
-            INSERT INTO {$this->tableName}(`id`, `code`, `name`, `description`,
-                        `created_at`, `updated_at`, `deleted_at`)
-            VALUES (null, :code, :name, :description, now(), NULL, NULL);";
-
-        /**
-         * Prepare INSERT statement
-         */
-        $stmt = $this->conn->prepare($query);
-
         /**
          * Sanitise values
          */
         $this->code = Utils::sanitize($this->code);
         $this->name = Utils::sanitize($this->name);
+        $this->icon = Utils::sanitize($this->icon);
         $this->description = Utils::sanitize($this->description);
+
+        /**
+         * INSERT a new category
+         */
+        $query = '';
+
+        if (!$this->icon) {
+            $query = "
+            INSERT INTO {$this->tableName}(`id`, `code`, `name`, `description`,
+                        `created_at`, `updated_at`, `deleted_at`)
+            VALUES (null, :code, :name, :description, now(), NULL, NULL);";
+        }
+
+        else {
+            $query = "
+            INSERT INTO {$this->tableName}(`id`, `code`, `name`, `icon`, `description`,
+                        `created_at`, `updated_at`, `deleted_at`)
+            VALUES (null, :code, :name, :icon, :description, now(), NULL, NULL);";
+        }
+
+        /**
+         * Prepare INSERT statement
+         */
+        $stmt = $this->conn->prepare($query);
 
         /**
          * Bind sanitised values
@@ -146,16 +165,22 @@ class Category
         $stmt->bindParam(":name", $this->name, PDO::PARAM_STR);
         $stmt->bindParam(":description", $this->description, PDO::PARAM_STR);
 
+        if ($this->icon) {
+            $stmt->bindParam(":icon", $this->icon, PDO::PARAM_STR);
+        }
+
         /**
          * Execute query
          */
         try {
             if ($stmt->execute()) {
-                return true;
+                return ['error' => false];
             }
-            return false;
+            return ['error' => true, 'message' => 'Could not add category. Please try again later.'];
         } catch (\PDOException $ex) {
-            return false;
+            return ['error' => true, 'message' => $ex->getMessage()];
+        } catch (\Exception $ex) {
+            return ['error' => true, 'message' => $ex->getMessage()];
         }
     }
 

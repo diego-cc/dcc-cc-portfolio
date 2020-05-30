@@ -41,7 +41,7 @@ namespace DccCcPortfolio;
             <li class="nav-item">
                 <a class="nav-link" href="../">Home</a>
             </li>
-            <li class="nav-item dropdown active">
+            <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="../products" id="navbarDropdown"
                    role="button" data-toggle="dropdown" aria-haspopup="true"
                    aria-expanded="false">
@@ -60,8 +60,8 @@ namespace DccCcPortfolio;
                     Category
                 </a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    <a class="dropdown-item" href="#">Browse</a>
-                    <a class="dropdown-item" href="create.php">Add</a>
+                    <a class="dropdown-item" href="../categories/browse.php">Browse</a>
+                    <a class="dropdown-item" href="../categories/create.php">Add</a>
                 </div>
             </li>
     </div>
