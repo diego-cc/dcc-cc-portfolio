@@ -11,8 +11,6 @@
 
 namespace DccCcPortfolio;
 
-use PDO;
-
 include_once '../../classes/Utils.php';
 include_once '../../config/Database.php';
 include_once '../../classes/Category.php';
@@ -149,7 +147,7 @@ include_once '../templates/nav.php' ?>
     <?php
 Utils::messages($messages) ?>
 
-    <div class="container">
+    <main role="main" class="container">
         <h1 class="text-center mb-5">Add a new category</h1>
 
         <form action="<?= Utils::sanitize($_SERVER['PHP_SELF']) ?>" method="POST" enctype="multipart/form-data">
@@ -205,7 +203,7 @@ Utils::messages($messages) ?>
                 <a class="h5 text-info" href="browse.php">Browse categories</a>
             </div>
         </form>
-    </div>
+    </main>
 
     <?php
 include_once '../templates/scripts.php' ?>

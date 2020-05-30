@@ -11,6 +11,8 @@
 
 namespace DccCcPortfolio;
 
+include_once '../../classes/Category.php';
+
 $title = 'Browse categories'
 ?>
 
@@ -165,51 +167,44 @@ include('../templates/nav.php'); ?>
                             <td><?= $row->id ?></td>
                             <td>
                                 <?php
-                                // Get icon extension
-                                $ext = pathinfo($row->icon, PATHINFO_EXTENSION);
+                                // map properties
+                                $cat = new Category(null);
+                                $cat->id = $row->id;
+                                $cat->code = $row->code;
+                                $cat->name = $row->name;
+                                $cat->icon = $row->icon;
+                                $cat->description = $row->description;
+                                $cat->createdAt = $row->created_at;
+                                $cat->updatedAt = $row->updated_at;
 
-                                if ($ext === 'png') {
-                                    // icon extension is valid, check if it was uploaded
-                                    try {
-                                        date_default_timezone_set('Australia/Perth');
-                                        $filePath = 'uploads/'.date_format(
-                                                new \DateTime($row->created_at),
-                                                'd-m-Y'
-                                            ).'/'.sha1($row->icon.'_'.$row->code).'.png';
+                                $foundIcon = $cat->getIconImage();
 
-                                        if (file_exists($filePath)) {
-                                            // display icon
-                                            echo '<img src="'.$filePath.'" alt="'.$row->icon.'" width="48" height="48" />';
-                                        } else {
-                                            // icon was not found, show its name anyway
-                                            // a placeholder icon could be displayed here as well
-                                            echo $row->icon;
-                                        }
-                                    } catch (\Exception $e) {
-                                        echo 'Could not load icon';
-                                    }
-                                } else {
-                                    // "Unavailable"
-                                    echo $row->icon;
+                                if ($foundIcon['found']) {
+                                    // image found, show it
+                                    echo '<img src="'.$foundIcon['path'].'" alt="'.$cat->icon.'" width="48" height="48" />';
+                                }
+                                else {
+                                    // image not found
+                                    echo $cat->icon;
                                 }
                                 ?>
                             </td>
-                            <td><?= htmlspecialchars_decode($row->code, ENT_QUOTES) ?></td>
-                            <td><?= htmlspecialchars_decode($row->name, ENT_QUOTES) ?></td>
-                            <td><?= htmlspecialchars_decode($row->description, ENT_QUOTES) ?></td>
+                            <td><?= htmlspecialchars_decode($cat->code, ENT_QUOTES) ?></td>
+                            <td><?= htmlspecialchars_decode($cat->name, ENT_QUOTES) ?></td>
+                            <td><?= htmlspecialchars_decode($cat->description, ENT_QUOTES) ?></td>
                             <td>
-                                <a href="read.php?id=<?= $row->id ?>"
+                                <a href="show.php/<?= $cat->id ?>"
                                    class="btn btn-info mr-1">
                                     View
                                 </a>
-                                <a href="update.php?id=<?= $row->id ?>"
+                                <a href="update.php?id=<?= $cat->id ?>"
                                    class="btn btn-warning mr-1">
                                     Edit
                                 </a>
                             </td>
                         </tr>
 
-                    <?php
+                        <?php
                     } ?>
                     </tbody>
                 </table>

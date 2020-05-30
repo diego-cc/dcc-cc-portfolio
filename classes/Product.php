@@ -39,7 +39,7 @@ class Product
     public $categoryID;
     /** @var */
     public $categoryName;
-    /** @var  */
+    /** @var */
     public $image;
     /** @var */
     public $createdAt;
@@ -71,7 +71,7 @@ class Product
      * Read and return product data
      * Use: `$productList = $prods->read();`
      *
-     * @return mixed
+     * @return array('error' => string, 'message' => string, 'stmt' => \PDOStatement)
      */
     public function read()
     {
@@ -85,10 +85,21 @@ class Product
                  ORDER BY p.created_at DESC;";
 
         // prepare, bind named parameter, and execute query
-        $stmt = $this->conn->prepare($query);
-        $stmt->execute();
+        $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        return $stmt;
+        $results = [];
+        try {
+            $stmt = $this->conn->prepare($query);
+            if ($stmt->execute()) {
+                $results = ['error' => false, 'stmt' => $stmt];
+            } else {
+                $results = ['error' => true, 'message' => 'Could not retrieve products: invalid query'];
+            }
+        } catch (\PDOException $e) {
+            $results = ['error' => true, 'message' => 'Could not retrieve products: connection failed'];
+        } finally {
+            return $results;
+        }
     }
 
     /**

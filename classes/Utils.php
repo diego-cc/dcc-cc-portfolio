@@ -72,6 +72,22 @@ class Utils
             }
         }
     }
+
+    /**
+     * Makes date/time human readable
+     * @param string|\DateTime $dateTime
+     * @return string
+     */
+    public static function prettyPrintDateTime($dateTime) {
+        if (isset($dateTime)) {
+            try {
+                return date_format(new \DateTime($dateTime), 'l, d F Y - h:i:s A');
+            } catch (\Exception $e) {
+                // There's no need to handle this exception for now
+            }
+        }
+        return '<span class="text-warning font-weight-bold">Unavailable data</span>';
+    }
 }
 
 ?>

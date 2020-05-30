@@ -60,8 +60,8 @@ namespace DccCcPortfolio;
                     Category
                 </a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    <a class="dropdown-item" href="../categories/browse.php">Browse</a>
-                    <a class="dropdown-item" href="../categories/create.php">Add</a>
+                    <a class="dropdown-item" href="/app/categories/browse.php">Browse</a>
+                    <a class="dropdown-item" href="/app/categories/create.php">Add</a>
                 </div>
             </li>
     </div>

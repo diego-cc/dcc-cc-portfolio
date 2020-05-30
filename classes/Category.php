@@ -144,9 +144,7 @@ class Category
             INSERT INTO {$this->tableName}(`id`, `code`, `name`, `description`,
                         `created_at`, `updated_at`, `deleted_at`)
             VALUES (null, :code, :name, :description, now(), NULL, NULL);";
-        }
-
-        else {
+        } else {
             $query = "
             INSERT INTO {$this->tableName}(`id`, `code`, `name`, `icon`, `description`,
                         `created_at`, `updated_at`, `deleted_at`)
@@ -188,7 +186,7 @@ class Category
      * Read and return category data for a given ID
      * Use: `$categoriesList = $cats->readOne($id);`
      * @param $id
-     * @return bool|PDOStatement
+     * @return array
      */
     public function readOne($id)
     {
@@ -196,10 +194,11 @@ class Category
          * SELECT a category
          */
         $query = "SELECT 
-                p.id, p.code, p.name, p.description, 
-                p.created_at,  p.updated_at, p.deleted_at
-            FROM {$this->tableName} AS p
-            WHERE p.id = :id;";
+                c.id, c.code, c.name, c.description, c.icon, 
+                c.created_at,  c.updated_at, c.deleted_at
+            FROM {$this->tableName} AS c
+            WHERE c.id = :id
+            LIMIT 1;";
 
         /**
          * Prepare statement
@@ -214,9 +213,26 @@ class Category
         /**
          * Execute query
          */
-        $stmt->execute();
+        if ($stmt->execute()) {
+            $cat = $stmt->fetch(PDO::FETCH_OBJ);
 
-        return $stmt;
+            if ($cat) {
+                // category found, return it
+                return ['error' => false, 'category' => $cat];
+            }
+            // category not found, return error
+            return ['error' => true, 'message' => 'Category not found'];
+        }
+        // statement failed to execute, return error
+        return ['error' => true, 'message' => 'Could not retrieve category from database. Please try again later.'];
+    }
+
+    /**
+     * Get all products that belong to this category
+     */
+    public function readAssociatedProducts() {
+
+
     }
 
     /**
@@ -333,6 +349,44 @@ class Category
         $stmt->execute();
 
         return $stmt;
+    }
+
+    /**
+     * @return array|bool[]
+     */
+    public function getIconImage()
+    {
+        // Get icon extension
+        $ext = pathinfo($this->icon, PATHINFO_EXTENSION);
+
+        if ($ext === 'png') {
+            // icon extension is valid, check if it was uploaded
+            try {
+                date_default_timezone_set('Australia/Perth');
+
+                // Instead of using a local path, the format below can be useful if images are hosted elsewhere
+                // It can also avoid potential headaches with nested paths
+                $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https://' : 'http://';
+
+                $filePath = $protocol . $_SERVER['SERVER_NAME'] . '/app/categories/uploads/'.date_format(
+                        new \DateTime($this->createdAt),
+                        'd-m-Y'
+                    ).'/'.sha1($this->icon.'_'.$this->code).'.png';
+
+                // If the image size can be retrieved, that means it exists!
+                // Otherwise, don't throw an error (@), return false instead
+                // See: https://stackoverflow.com/a/15132482
+                if (@getimagesize($filePath)) {
+                    // return icon path
+                    return ['found' => true, 'path' => $filePath];
+                }
+            } catch (\Exception $e) {
+                return ['found' => false];
+            }
+        }
+        // icon was not found, show its name anyway
+        // a placeholder icon could be displayed here as well
+        return ['found' => false];
     }
 }
 
