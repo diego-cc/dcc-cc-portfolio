@@ -229,10 +229,37 @@ class Category
 
     /**
      * Get all products that belong to this category
+     * @param  int  $limit Optionally limit the number of results (e.g. for pagination)
+     * @return array Query results in the format ('error' => bool, 'message' => string, 'stmt' => PDOStatement)
      */
-    public function readAssociatedProducts() {
+    public function readAssociatedProducts(int $limit) {
+        $q = "";
+        $stmt = "";
+        $this->id = Utils::sanitize($this->id);
+        $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
+        if (isset($limit) && $limit > 0) {
+            $limit = Utils::sanitize($limit);
+            $q = "SELECT * FROM products AS p WHERE p.category_id = :id LIMIT :limit";
+            $stmt = $this->conn->prepare($q);
+            $stmt->bindParam(':id', $this->id, PDO::PARAM_INT);
+            $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
+        }
+        else {
+            $q = "SELECT * FROM products AS p WHERE p.category_id = :id";
+            $stmt = $this->conn->prepare($q);
+            $stmt->bindParam(':id', $this->id, PDO::PARAM_INT);
+        }
 
+        try {
+            if ($stmt->execute()) {
+                return ['error' => false, 'stmt' => $stmt];
+            }
+            return ['error' => true, 'message' => 'Could not retrieve products: failed to execute query'];
+        }
+        catch (\PDOException $ex) {
+            return ['error' => true, 'message' => 'Could not connect to database'];
+        }
     }
 
     /**
@@ -251,6 +278,7 @@ class Category
                 code = :code, 
                 name = :name,
                 description = :description,
+                icon = :icon,
                 updated_at = now()
              WHERE id=:id;";
 
@@ -266,6 +294,7 @@ class Category
         $this->code = Utils::sanitize($this->code);
         $this->name = Utils::sanitize($this->name);
         $this->description = Utils::sanitize($this->description);
+        $this->icon = Utils::sanitize($this->icon);
 
         /**
          * Bind params
@@ -274,6 +303,7 @@ class Category
         $stmt->bindParam(":code", $this->code, PDO::PARAM_STR);
         $stmt->bindParam(":name", $this->name, PDO::PARAM_STR);
         $stmt->bindParam(":description", $this->description, PDO::PARAM_STR);
+        $stmt->bindParam(":icon", $this->icon, PDO::PARAM_STR);
 
         /**
          * Execute UPDATE statement
