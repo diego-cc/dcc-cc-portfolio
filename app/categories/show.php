@@ -22,40 +22,15 @@ $title = 'Show category'
 ?>
 
     <?php
-$id = '';
 $messages = [];
 $cat = '';
-$prods = [];
 
-$id = basename(Utils::sanitize($_SERVER['PHP_SELF']));
+$result = Utils::getCategoryByEndpointId();
 
-if (is_numeric($id) && floor($id) == $id && (int)$id > 0) {
-    $id = (int)$id;
-
-    // try to retrieve category from database
-    $db = new Database();
-    $conn = $db->getConnection();
-
-    $cat = new Category($conn);
-
-    $result = $cat->readOne($id);
-
-    if (!$result['error']) {
-        // category was found, map values
-        $cat->id = $result['category']->id;
-        $cat->code = $result['category']->code;
-        $cat->name = $result['category']->name;
-        $cat->icon = $result['category']->icon;
-        $cat->description = $result['category']->description;
-        $cat->createdAt = $result['category']->created_at;
-        $cat->updatedAt = $result['category']->updated_at;
-    } else {
-        // category was not found, show errors
-        $messages[] = ['Danger' => $result['message']];
-    }
+if (!$result['error']) {
+    $cat = $result['category'];
 } else {
-    // invalid category ID provided in the URL
-    $messages[] = ['Danger' => 'Invalid category ID'];
+    $messages[] = $result['message'];
 }
 ?>
 
@@ -66,7 +41,7 @@ include_once '../templates/nav.php' ?>
 
     <main class="container-fluid" role="main">
         <div class="container">
-            <h1 class="text-center mb-5">Viewing details of category #<?= $id ?></h1>
+            <h1 class="text-center mb-5">Viewing details of category #<?= isset($cat->id) ? $cat->id : 'Invalid ID' ?></h1>
 
             <?php
             if (isset($cat->id)) {
@@ -102,7 +77,7 @@ include_once '../templates/nav.php' ?>
         <?php
         // get all associated products
         if (isset($cat->id)) {
-            $results = $cat->readAssociatedProducts(-1);
+            $results = $cat->readAssociatedProducts();
 
             if (!$results['error']) {
                 // all good, products were retrieved
@@ -113,6 +88,7 @@ include_once '../templates/nav.php' ?>
                 <?php
                 if ($stmt->rowCount() > 0) {
                     // If there's any product that belong to this category, create table
+                    // Pagination could be implemented here, since the readAssociatedProducts method supports it
                     ?>
                     <div class="row mb-5">
                         <div class="col">
@@ -163,7 +139,7 @@ include_once '../templates/nav.php' ?>
         ?>
         <div class="d-flex flex-column flex-md-row justify-content-center align-items-center mb-5">
             <a href="/app/categories/create.php" class="btn btn-primary mb-4 mb-md-0 mr-md-5">Add new category</a>
-            <a href="/app/categories/update.php/<?= $cat->id ?>"
+            <a href="/app/categories/edit.php/<?= $cat->id ?>"
                class="btn btn-warning mb-4 mb-md-0 mr-md-5">
                 Edit category
             </a>

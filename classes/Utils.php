@@ -88,6 +88,41 @@ class Utils
         }
         return '<span class="text-warning font-weight-bold">Unavailable data</span>';
     }
+
+    public static function getCategoryByEndpointId() {
+        $id = basename(Utils::sanitize($_SERVER['PHP_SELF']));
+
+        if (is_numeric($id) && floor($id) == $id && (int)$id > 0) {
+            $id = (int)$id;
+
+            // try to retrieve category from database
+            $db = new Database();
+            $conn = $db->getConnection();
+
+            $cat = new Category($conn);
+
+            $result = $cat->readOne($id);
+
+            if (!$result['error']) {
+                // category was found, map values
+                $cat->id = $result['category']->id;
+                $cat->code = $result['category']->code;
+                $cat->name = $result['category']->name;
+                $cat->icon = $result['category']->icon;
+                $cat->description = $result['category']->description;
+                $cat->createdAt = $result['category']->created_at;
+                $cat->updatedAt = $result['category']->updated_at;
+
+                return ['error' => false, 'category' => $cat];
+            } else {
+                // category was not found, show errors
+                return ['error' => true, 'message' =>  $result['message']];
+            }
+        } else {
+            // invalid category ID provided in the URL
+            return ['error' => true, 'message' => ['Danger' => 'Invalid category ID']];
+        }
+    }
 }
 
 ?>

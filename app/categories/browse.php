@@ -75,7 +75,7 @@ include('../templates/nav.php'); ?>
     // select only the data needed per page, sorted by latest updated
     $query = "SELECT id, code, icon, name, description, created_at, updated_at
                           FROM categories
-                          ORDER BY created_at DESC, updated_at ASC
+                          ORDER BY updated_at DESC
                           LIMIT :rowsToSkip, :recordsPerPage";
 
     $rowsToSkip = ($activePage - 1) * $recordsPerPage;
@@ -197,7 +197,7 @@ include('../templates/nav.php'); ?>
                                    class="btn btn-info mr-1">
                                     View
                                 </a>
-                                <a href="update.php?id=<?= $cat->id ?>"
+                                <a href="edit.php/<?= $cat->id ?>"
                                    class="btn btn-warning mr-1">
                                     Edit
                                 </a>

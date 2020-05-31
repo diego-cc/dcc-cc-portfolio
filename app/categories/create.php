@@ -19,6 +19,7 @@ $title = 'Add category';
 ?>
 
     <?php
+$results = '';
 $messages = [];
 $img = '';
 $icon = '';
@@ -26,118 +27,18 @@ $code = '';
 $name = '';
 $description = '';
 
-date_default_timezone_set('Australia/Perth');
-$uploadDir = 'uploads/'.date('d-m-Y').'/';
-$uploadedFile = '';
+$db = new Database();
+$conn = $db->getConnection();
 
-// Form validation
+$cat = new Category($conn);
+
 if ($_POST) {
-    // Icon validation
-    if ($_FILES['icon']['error'] === UPLOAD_ERR_OK) {
-        $img = $_FILES['icon'];
+    $results = $cat->handleSaveRequest('CREATE', $code, $name, $icon, $description);
+    $messages = $results['messages'];
 
-        $imageType = $img['type'];
-        $imageSizeMB = $img['size'] / (1024 * 1024);
-
-        $imgSize = getimagesize($img['tmp_name']);
-        $imageX = $imgSize[0];
-        $imageY = $imgSize[1];
-
-        $icon = Utils::sanitize($img['name']);
-
-        if ($imageType !== 'image/png') {
-            $messages[] = ['Danger' => 'Invalid image format. Only PNG is allowed'];
-        }
-
-        if ($imageX > 256 || $imageY > 256) {
-            $messages[] = ['Danger' => 'Only icons up to 256x256 are allowed'];
-        }
-
-        if ($imageSizeMB > 2) {
-            $messages[] = ['Danger' => 'Only icons up to 2 MB are allowed'];
-        }
-
-        if (strlen($icon) > 255 || strlen(trim($icon)) === '.png') {
-            $messages[] = ['Warning' => 'Invalid icon filename. Up to 255 characters are allowed'];
-        }
-    }
-
-    // Code validation
-    if (isset($_POST['code'])) {
-        $code = Utils::sanitize($_POST['code']);
-
-        if (strlen(trim($code)) <= 0) {
-            $messages[] = ['Danger' => 'Please provide a category code'];
-        }
-
-        if (strlen(trim($code)) !== 4) {
-            $messages[] = ['Danger' => 'Exactly 4 characters are required for the category code'];
-        }
-    }
-
-    // Name validation
-    if (isset($_POST['name'])) {
-        $name = Utils::sanitize($_POST['name']);
-
-        if (strlen(trim($name)) <= 0) {
-            $messages[] = ['Danger' => 'Please provide a category name'];
-        }
-
-        if (strlen($name) > 32) {
-            $messages[] = ['Danger' => 'Only category names up to 32 characters are allowed'];
-        }
-    }
-
-    // Description validation
-    if (isset($_POST['description'])) {
-        $description = Utils::sanitize($_POST['description']);
-
-        if (strlen(trim($description)) <= 0) {
-            $messages[] = ['Danger' => 'Please provide a description'];
-        }
-
-        if (strlen($description) > 255) {
-            $messages[] = ['Danger' => 'Only descriptions up to 255 characters are allowed'];
-        }
-    }
-
-    // No errors, save data
-    if (empty($messages)) {
-        $db = new Database();
-        $conn = $db->getConnection();
-
-        $cat = new Category($conn);
-
-        $cat->code = $code;
-        $cat->name = $name;
-        $cat->icon = $icon;
-        $cat->description = $description;
-
-        $result = $cat->create();
-
-        if (!$result['error']) {
-            // category was added to database, save icon
-            // if upload directory doesn't exist, create it recursively
-            if (!is_dir($uploadDir)) {
-                mkdir($uploadDir, 0777, true);
-            }
-
-            // hash icon with corresponding category code
-            // not perfect, but since $code is unique should be good enough for now
-            $uploadedFile = $uploadDir.sha1($icon.'_'.$code).'.png';
-
-            // save icon / show warning message if it could not be saved
-            if (isset($img['tmp_name'])) {
-                if (!move_uploaded_file($img['tmp_name'], $uploadedFile)) {
-                    $messages[] = ['Warning' => 'Could not save icon. Please try again or contact your server administrator.'];
-                }
-            }
-            $messages[] = ['Success' => 'Category successfully added'];
-        } else {
-            // category was not added, show error
-            $messages[] = ['Warning' => 'Could not add category: '.$result['message']];
-        }
-    }
+    $code = $results['fields']['code'];
+    $name = $results['fields']['name'];
+    $description = $results['fields']['description'];
 }
 ?>
 
