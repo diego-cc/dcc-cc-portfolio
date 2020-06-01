@@ -87,28 +87,72 @@ class Category
 
     /**
      * Read and return all categories as a PDO statement
-     * Use: `$categoriesList = $category->read();`
      *
-     * @return bool|PDOStatement
+     * $recordsPerPage and $rowsToSkip can be optionally passed to limit the number of rows selected
+     *
+     * (Useful for pagination)
+     *
+     * Use:
+     *
+     * `$categoriesList = $category->read();`
+     *
+     * `$firstFiveCategories = $category->read(5, 0);`
+     *
+     * @param  int  $recordsPerPage  Optional parameter to limit the number of records retrieved from the database
+     * @param  int  $rowsToSkip  Optional parameter to skip some of the records
+     * @return array    Results in the format: ['error' => bool, 'message' => array, 'stmt' => PDOStatement]
      */
-    public function read()
+    public function read(int $recordsPerPage = -1, int $rowsToSkip = 0)
     {
-        /**
-         * SELECT all categories
-         */
-        $query = "SELECT 
-                    c.id, c.code, c.name, c.description, 
+        $query = '';
+        $stmt = '';
+
+        if ($recordsPerPage > 0 && $rowsToSkip >= 0) {
+            $query = "SELECT
+                        c.id, c.code, c.name, c.description, c.icon,
+                        c.created_at, c.updated_at, c.deleted_at
+                      FROM {$this->tableName} AS c
+                      ORDER BY c.updated_at DESC
+                      LIMIT :rowsToSkip, :recordsPerPage";
+
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':rowsToSkip', $rowsToSkip, PDO::PARAM_INT);
+            $stmt->bindParam(':recordsPerPage', $recordsPerPage, PDO::PARAM_INT);
+        } else {
+            /**
+             * SELECT all categories
+             */
+            $query = "SELECT 
+                    c.id, c.code, c.name, c.description, c.icon,
                     c.created_at,  c.updated_at, c.deleted_at
                  FROM {$this->tableName} AS c
-                 ORDER BY c.created_at DESC;";
+                 ORDER BY c.updated_at DESC;";
 
-        /**
-         * Prepare SELECT statement
-         */
-        $stmt = $this->conn->prepare($query);
-        $stmt->execute();
+            $stmt = $this->conn->prepare($query);
+        }
 
-        return $stmt;
+        try {
+            $stmt->execute();
+
+            return [
+                'error' => false,
+                'stmt' => $stmt
+            ];
+        } catch (\PDOException $e) {
+            return [
+                'error' => true,
+                'message' => [
+                    'Warning' => 'Could not connect to the database'
+                ]
+            ];
+        } catch (\Exception $e) {
+            return [
+                'error' => true,
+                'message' => [
+                    'Danger' => 'Could not fetch categories. Please try again later or contact your server administrator'
+                ]
+            ];
+        }
     }
 
     /**
@@ -141,14 +185,12 @@ class Category
 
         if (!$this->icon) {
             $query = "
-            INSERT INTO {$this->tableName}(`id`, `code`, `name`, `description`,
-                        `created_at`, `updated_at`, `deleted_at`)
-            VALUES (null, :code, :name, :description, now(), NULL, NULL);";
+            INSERT INTO {$this->tableName}(`id`, `code`, `name`, `description`)
+            VALUES (null, :code, :name, :description);";
         } else {
             $query = "
-            INSERT INTO {$this->tableName}(`id`, `code`, `name`, `icon`, `description`,
-                        `created_at`, `updated_at`, `deleted_at`)
-            VALUES (null, :code, :name, :icon, :description, now(), NULL, NULL);";
+            INSERT INTO {$this->tableName}(`id`, `code`, `name`, `icon`, `description`)
+            VALUES (null, :code, :name, :icon, :description);";
         }
 
         /**
@@ -267,7 +309,7 @@ class Category
     }
 
     /**
-     * Update category
+     * Update a category
      *
      * @return bool
      */
@@ -325,13 +367,14 @@ class Category
 
     /**
      * Delete a category
-     * @param  string  $id  The ID of the category to be deleted
+     * @param  string  $id  The ID of the category to be deleted. If not passed, will fallback to $this->id
      * @return bool | PDOStatement The result of the query
      */
     public function delete($id)
     {
-        if (!isset($id)) $id = $this->id;
-
+        if (!isset($id)) {
+            $id = $this->id;
+        }
         /**
          * DELETE statement
          */
@@ -344,10 +387,24 @@ class Category
          * Prepare statement, bind ID and execute query
          */
         $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':id', $id, PDO::PARAM_STR);
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
 
         try {
-            $stmt->execute();
+            if ($stmt->execute()) {
+                // category was found and successfully deleted, also delete its icon
+                $result = $this->getIconImage();
+
+                if ($result['found']) {
+                    // image was found, delete it
+                    $filePath = 'uploads/'.date_format(
+                            new \DateTime($this->createdAt),
+                            'd-m-Y'
+                        ).'/'.sha1($this->icon.'_'.$this->code).'.png';
+
+                    unlink($filePath);
+                }
+            }
+
             return $stmt;
         } catch (\PDOException $e) {
             return $stmt;
@@ -388,7 +445,10 @@ class Category
     }
 
     /**
-     * @return array|bool[]
+     * Tries to find a locally stored icon image (from the uploads directory)
+     * @return array    Results in the following format:
+     *
+     * ['found' => bool, 'path' => string]
      */
     public function getIconImage()
     {
@@ -426,7 +486,7 @@ class Category
     }
 
     /**
-     * Saves uploaded images
+     * Tries to save uploaded images
      * @param  array  $img  Array containing image data, from $_FILES
      * @param  string  $uploadDir  Upload directory
      * @return  array   Results: ['error' => bool, 'messages' => array]
@@ -475,6 +535,7 @@ class Category
     }
 
     /**
+     * Handles requests to save changes to the database.
      * @param  string  $action  Action type, e.g. "CREATE" or "UPDATE"
      * @param  string  $code
      * @param  string  $name
@@ -563,6 +624,7 @@ class Category
 
             // No errors, save data
             if (empty($messages)) {
+                // add a new item to the database
                 if (strtoupper(trim($action)) === 'CREATE') {
                     $this->code = $code;
                     $this->name = $name;
@@ -573,11 +635,14 @@ class Category
 
                     if (!$result['error']) {
                         // category was added to database, save icon
-                        $saveImageResults = $this->saveIconImage($img, $uploadDir);
+                        if (isset($img)) {
+                            $saveImageResults = $this->saveIconImage($img, $uploadDir);
 
-                        if ($saveImageResults['error']) {
-                            $messages[] = $saveImageResults['messages'][0];
+                            if ($saveImageResults['error']) {
+                                $messages[] = $saveImageResults['messages'][0];
+                            }
                         }
+
                         $messages[] = ['Success' => 'Category successfully added'];
                         return [
                             'error' => false,
@@ -590,7 +655,8 @@ class Category
                     }
                 } else {
                     if (strtoupper(trim($action)) === 'UPDATE') {
-                        // check properties to avoid over-posting requests
+                        // update existing item
+                        // check properties first to avoid over-posting requests
                         if (
                             empty(trim($icon)) &&
                             $this->code === $code &&
@@ -659,6 +725,7 @@ class Category
                             }
                         }
 
+                        // proceed to update item
                         $this->code = $code;
                         if ($this->update()) {
                             return [
@@ -669,7 +736,7 @@ class Category
                         } else {
                             return [
                                 'error' => true,
-                                'messages' => [['Warning' => 'Failed to update category. Verify that the information entered is correct and try again.']],
+                                'messages' => [['Warning' => 'Failed to update category. Verify that the information entered is correct (e.g. no code duplicates) and try again.']],
                                 'fields' => ['code' => $code, 'name' => $name, 'description' => $description]
                             ];
                         }

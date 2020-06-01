@@ -36,6 +36,8 @@ if ($result['error']) {
 }
 
 if (isset($_POST['id'])) {
+    // form submitted, get id
+    // it won't actually be used to delete the category, it's there simply to have some data to POST
     $id = Utils::sanitize($_POST['id']);
 
     if (is_numeric($id) && isset($cat->id) && (int)$id === $cat->id) {
@@ -75,7 +77,6 @@ if (isset($_POST['id'])) {
         }
     }
 }
-
 ?>
 <?php
 include_once '../templates/nav.php' ?>

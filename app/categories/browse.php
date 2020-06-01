@@ -19,6 +19,7 @@ include_once '../../config/Database.php';
 
 $title = 'Browse categories';
 
+$cat = '';
 $num = 0;
 $activePage = '';
 $numOfPages = '';
@@ -31,6 +32,8 @@ $recordsPerPage = 5;
 try {
     $database = new Database();
     $conn = $database->getConnection();
+
+    $cat = new Category($conn);
 
     // get total number of records
     $queryCount = "SELECT COUNT(id) AS count FROM categories";
@@ -47,24 +50,24 @@ try {
     $activePage = 1;
 
     if (isset($_GET["page"]) && is_numeric($_GET["page"]) && (int)$_GET["page"] > 0) {
-        // if the page required is greater than the number of pages, set the last one to be active
+        // if the page count requested is greater than the number of pages, set the last one to active
         $activePage = (int)$_GET["page"] > $numOfPages ? $numOfPages : (int)$_GET["page"];
     }
 
     // select only the data needed per page, sorted by latest updated
-    $query = "SELECT id, code, icon, name, description, created_at, updated_at
-                          FROM categories
-                          ORDER BY updated_at DESC
-                          LIMIT :rowsToSkip, :recordsPerPage";
-
     $rowsToSkip = ($activePage - 1) * $recordsPerPage;
 
-    $stmt = $conn->prepare($query);
-    $stmt->bindParam(":rowsToSkip", $rowsToSkip, PDO::PARAM_INT);
-    $stmt->bindParam(":recordsPerPage", $recordsPerPage, PDO::PARAM_INT);
-    $stmt->execute();
+    $results = $cat->read($recordsPerPage, $rowsToSkip);
 
-    $num = $stmt->rowCount();
+    if (!$results['error']) {
+        // categories found
+        $stmt = $results['stmt'];
+        $num = $stmt->rowCount();
+    }
+    else {
+        // errors, could not retrieve categories
+        $messages[] = $results['message'];
+    }
 
     if ($num < 1) {
         // if no records found

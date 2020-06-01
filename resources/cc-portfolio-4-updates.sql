@@ -11,3 +11,9 @@ ALTER TABLE `products`
 
 ALTER TABLE `categories`
 	ADD COLUMN `deleted_at`  datetime     NULL;
+
+ALTER TABLE `categories`
+    CHANGE COLUMN `updated_at`  `updated_at` datetime DEFAULT NOW() ON UPDATE NOW();
+
+ALTER TABLE `categories`
+    ADD COLUMN `icon` varchar(255) DEFAULT 'Unavailable' AFTER `code`;

@@ -85,6 +85,7 @@ class Utils
                 return date_format(new \DateTime($dateTime), 'l, d F Y - h:i:s A');
             } catch (\Exception $e) {
                 // There's no need to handle this exception for now
+                // even if $dateTime is invalid, the try block will still run
             }
         }
         return '<span class="text-warning font-weight-bold">Unavailable data</span>';
