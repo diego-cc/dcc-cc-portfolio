@@ -5,7 +5,7 @@ A demo application for a fictional small retail store, developed as an assignmen
 Make sure you have installed PHP (7.4+) and MariaDB (10.4+) before proceeding.
 
 ### 1 - Clone the repo
-`https://github.com/diego-cc/dcc-cc-portfolio.git`
+`git clone https://github.com/diego-cc/dcc-cc-portfolio.git`
 
 ### 2 - Move to the project's directory
 `cd dcc-cc-portfolio`
@@ -19,7 +19,7 @@ php reset.php
 ```
 
 ### 4 - Start the application
-Move the project to your `www` folder. Then, if you're using Laragon, press start and navigate to:
+Move the project to your `www` folder. Then, if you're using Laragon, press start (or restart it) and navigate to:
 
 `http://dcc-cc-portfolio.test/app/categories/browse.php`
 
