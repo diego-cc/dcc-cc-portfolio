@@ -19,24 +19,36 @@ $title = 'Edit category';
 ?>
 
 <?php
-$cat = '';
-$messages = [];
-$result = Utils::getCategoryByEndpointId();
-
-if (!$result['error']) {
-    $cat = $result['category'];
-} else {
-    $messages[] = $result['message'];
-}
 $code = '';
 $name = '';
 $icon = '';
 $img = '';
 $description = '';
+$cat = '';
+$messages = [];
+$result = '';
+
+$result = Utils::tryFetchCategory($messages);
+
+if ($result['error']) {
+    $messages = $result['messages'];
+} else {
+    $cat = $result['category'];
+}
 
 if ($_POST) {
-    $results = $cat->handleSaveRequest('UPDATE', $code, $name, $icon, $description);
-    $messages = $results['messages'];
+    try {
+        $results = $cat->handleSaveRequest('UPDATE', $code, $name, $icon, $description);
+        $messages = $results['messages'];
+    } catch (\PDOException $e) {
+        $messages[] = [
+            'Danger' => 'Could not connect to the database'
+        ];
+    } catch (\Exception $e) {
+        $messages[] = [
+            'Warning' => 'Could not send request: invalid action'
+        ];
+    }
 }
 ?>
 

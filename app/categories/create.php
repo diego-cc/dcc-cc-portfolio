@@ -26,22 +26,36 @@ $icon = '';
 $code = '';
 $name = '';
 $description = '';
+$db = '';
+$conn = '';
+$cat = '';
 
-$db = new Database();
-$conn = $db->getConnection();
+try {
+    $db = new Database();
+    $conn = $db->getConnection();
 
-$cat = new Category($conn);
+    $cat = new Category($conn);
+} catch (\PDOException $e) {
+    $messages[] = [
+        'Danger' => 'Could not connect to the database'
+    ];
+}
 
 if ($_POST) {
-    $results = $cat->handleSaveRequest('CREATE', $code, $name, $icon, $description);
-    $messages = $results['messages'];
+    try {
+        $results = $cat->handleSaveRequest('CREATE', $code, $name, $icon, $description);
+        $messages = $results['messages'];
 
-    $code = $results['fields']['code'];
-    $name = $results['fields']['name'];
-    $description = $results['fields']['description'];
+        $code = $results['fields']['code'];
+        $name = $results['fields']['name'];
+        $description = $results['fields']['description'];
+    } catch (\Exception $e) {
+        $messages[] = [
+            'Warning' => 'Could not send request: invalid action'
+        ];
+    }
 }
 ?>
-
     <?php
 include_once '../templates/nav.php' ?>
 

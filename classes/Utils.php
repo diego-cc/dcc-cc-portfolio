@@ -63,10 +63,10 @@ class Utils
     {
         foreach ($messageList as $message) {
             foreach ($message as $type => $text) {
-                echo '<div class="alert alert-' . strtolower($type) . ' alert-dismissible fade show" role="alert">';
-                echo '<p class="text-center">'. $text . '</p>';
+                echo '<div class="alert alert-'.strtolower($type).' alert-dismissible fade show" role="alert">';
+                echo '<p class="text-center">'.$text.'</p>';
                 echo '<button type="button" class="close" data-dismiss="alert" aria-label="Close">';
-                echo  '<span aria-hidden="true">&times;</span>';
+                echo '<span aria-hidden="true">&times;</span>';
                 echo '</button>';
                 echo '</div>';
             }
@@ -75,10 +75,11 @@ class Utils
 
     /**
      * Makes date/time human readable
-     * @param string|\DateTime $dateTime
+     * @param  string|\DateTime  $dateTime
      * @return string
      */
-    public static function prettyPrintDateTime($dateTime) {
+    public static function prettyPrintDateTime($dateTime)
+    {
         if (isset($dateTime)) {
             try {
                 return date_format(new \DateTime($dateTime), 'l, d F Y - h:i:s A');
@@ -89,7 +90,12 @@ class Utils
         return '<span class="text-warning font-weight-bold">Unavailable data</span>';
     }
 
-    public static function getCategoryByEndpointId() {
+    /**
+     * Retrieves a category by its ID from the endpoint
+     * @return array    Results in the format: ['error' => bool, 'message' => array, 'category' => Category]
+     */
+    public static function getCategoryByEndpointId()
+    {
         $id = basename(Utils::sanitize($_SERVER['PHP_SELF']));
 
         if (is_numeric($id) && floor($id) == $id && (int)$id > 0) {
@@ -116,11 +122,60 @@ class Utils
                 return ['error' => false, 'category' => $cat];
             } else {
                 // category was not found, show errors
-                return ['error' => true, 'message' =>  $result['message']];
+                return ['error' => true, 'message' => $result['message']];
             }
         } else {
             // invalid category ID provided in the URL
             return ['error' => true, 'message' => ['Danger' => 'Invalid category ID']];
+        }
+    }
+
+    /**
+     * Tries to find a category by its ID in the URL endpoint.
+     *
+     * Basically, a wrapper for `Utils::getCategoryByEndpointId()`
+     * @param  array  $messages Error messages to be displayed
+     * @return array  Results in the format: ['error' => bool, 'messages' => array, 'category' => Category]
+     */
+    public static function tryFetchCategory(array $messages)
+    {
+        $cat = '';
+        try {
+            $result = Utils::getCategoryByEndpointId();
+
+            if (!$result['error']) {
+                $cat = $result['category'];
+
+                return [
+                    'error' => false,
+                    'category' => $cat
+                ];
+            } else {
+                $messages[] = $result['message'];
+
+                return [
+                    'error' => true,
+                    'messages' => $messages
+                ];
+            }
+        } catch (\PDOException $e) {
+            $messages[] = [
+                'Danger' => 'Could not connect to the database'
+            ];
+
+            return [
+                'error' => true,
+                'messages' => $messages
+            ];
+        } catch (\Exception $e) {
+            $messages[] = [
+                'Warning' => 'Could not fetch category'
+            ];
+
+            return [
+                'error' => true,
+                'messages' => $messages
+            ];
         }
     }
 }

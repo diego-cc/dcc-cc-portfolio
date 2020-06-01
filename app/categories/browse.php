@@ -11,45 +11,24 @@
 
 namespace DccCcPortfolio;
 
+use PDO;
+
 include_once '../../classes/Category.php';
+include_once '../../classes/Utils.php';
+include_once '../../config/Database.php';
 
-$title = 'Browse categories'
-?>
+$title = 'Browse categories';
 
-<?php
-include('../templates/nav.php'); ?>
+$num = 0;
+$activePage = '';
+$numOfPages = '';
+$stmt = '';
+$messages = [];
 
-<!-- container -->
-<main role="main" class="container">
+// Fetch data
+$recordsPerPage = 5;
 
-    <div class="row mb-4 text-center">
-        <div class="col-sm">
-            <h1>Browse categories</h1>
-        </div>
-    </div>
-
-    <div class="row mb-5">
-        <div class="col-sm text-center">
-            <a class="btn btn-primary btn-lg" href="create.php">
-                Add a new category
-            </a>
-        </div>
-    </div>
-
-    <div class="row mb-2 text-center">
-        <div class="col-sm">
-            <p>All categories</p>
-        </div>
-    </div>
-    <?php
-
-    // Fetch data
-    use PDO;
-
-    include_once '../../config/Database.php';
-
-    $recordsPerPage = 5;
-
+try {
     $database = new Database();
     $conn = $database->getConnection();
 
@@ -86,6 +65,48 @@ include('../templates/nav.php'); ?>
     $stmt->execute();
 
     $num = $stmt->rowCount();
+
+    if ($num < 1) {
+        // if no records found
+        $messages[] = ['info' => 'No records found'];
+    }
+} catch (\PDOException $ex) {
+    $messages[] = [
+        'Danger' => 'Could not connect to the database'
+    ];
+}
+?>
+
+<?php
+include('../templates/nav.php'); ?>
+
+<?php
+Utils::messages($messages) ?>
+<!-- container -->
+<main role="main" class="container">
+
+    <div class="row mb-4 text-center">
+        <div class="col-sm">
+            <h1>Browse categories</h1>
+        </div>
+    </div>
+
+    <div class="row mb-5">
+        <div class="col-sm text-center">
+            <a class="btn btn-primary btn-lg" href="create.php">
+                Add a new category
+            </a>
+        </div>
+    </div>
+
+    <div class="row mb-2 text-center">
+        <div class="col-sm">
+            <p>All categories</p>
+        </div>
+    </div>
+    <?php
+
+
     ?>
 
     <div class="row">
@@ -182,8 +203,7 @@ include('../templates/nav.php'); ?>
                                 if ($foundIcon['found']) {
                                     // image found, show it
                                     echo '<img src="'.$foundIcon['path'].'" alt="'.$cat->icon.'" width="48" height="48" />';
-                                }
-                                else {
+                                } else {
                                     // image not found
                                     echo $cat->icon;
                                 }
@@ -209,11 +229,6 @@ include('../templates/nav.php'); ?>
                     </tbody>
                 </table>
                 <?php
-            } else {
-                include_once '../../classes/Utils.php';
-                // if no records found
-                $messages[] = ['info' => 'No records found'];
-                Utils::messages($messages);
             }
             ?>
         </div>

@@ -24,13 +24,14 @@ $title = 'Show category'
     <?php
 $messages = [];
 $cat = '';
+$result = [];
 
-$result = Utils::getCategoryByEndpointId();
+$result = Utils::tryFetchCategory($messages);
 
-if (!$result['error']) {
-    $cat = $result['category'];
+if ($result['error']) {
+    $messages = $result['messages'];
 } else {
-    $messages[] = $result['message'];
+    $cat = $result['category'];
 }
 ?>
 
@@ -41,7 +42,8 @@ include_once '../templates/nav.php' ?>
 
     <main class="container-fluid" role="main">
         <div class="container">
-            <h1 class="text-center mb-5">Viewing details of category #<?= isset($cat->id) ? $cat->id : 'Invalid ID' ?></h1>
+            <h1 class="text-center mb-5">Viewing details of category
+                #<?= isset($cat->id) ? $cat->id : 'Invalid ID' ?></h1>
 
             <?php
             if (isset($cat->id)) {
