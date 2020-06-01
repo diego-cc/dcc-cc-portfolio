@@ -330,6 +330,8 @@ class Category
      */
     public function delete($id)
     {
+        if (!isset($id)) $id = $this->id;
+
         /**
          * DELETE statement
          */
